@@ -6,7 +6,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", default=False, cast=bool)
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost")
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost").split(",")
+
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -17,9 +18,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",
     "drf_yasg",
-    "user_profile",
-    "login",
-    "register",
+    "users",
 ]
 
 MIDDLEWARE = [
