@@ -11,3 +11,8 @@ class MumentUserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return MumentUser.objects.create_user(**validated_data)
+    
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MumentUser
+        fields = ["name", "img_url", "mu_id", "phone", "domain", "idea_submission", "team"]
