@@ -32,7 +32,6 @@ class MumentUserManager(BaseUserManager):
 class MumentUser(AbstractBaseUser):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=100)
     img_url = models.URLField(blank=True, null=True)
@@ -40,8 +39,9 @@ class MumentUser(AbstractBaseUser):
     phone = models.CharField(max_length=15)
     domain = models.CharField(max_length=100, blank=True, null=True)
     idea_submission = models.TextField()
-    role = models.CharField(max_length=50, blank=True, null=True)
     team = models.CharField(max_length=50, blank=True, null=True)
+
+    last_login = None
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["name", "phone", "domain", "idea_submission"]
