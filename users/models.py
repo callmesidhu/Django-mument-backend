@@ -44,7 +44,7 @@ class MumentUser(AbstractBaseUser):
     last_login = None
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["name", "phone", "domain", "idea_submission"]
+    REQUIRED_FIELDS = ["name", "phone", "domain"]
 
     objects = MumentUserManager()
 
