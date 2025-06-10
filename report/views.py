@@ -6,19 +6,14 @@ from rest_framework.exceptions import AuthenticationFailed
 from .models import DailyUpdate
 from .serializers import DailyUpdateSerializer
 
-# Where we fetch the caller’s details.  Override in settings.py if you move it.
 USER_DETAILS_URL = getattr(
     settings,
     "USER_DETAILS_URL",
-    "http://127.0.0.1:8000/api/users/details/",
+    "https://mument-apis.onrender.com/api/users/details/",
 )
 
 
 def _extract_uuid(request):
-    """
-    Helper: replay the caller’s Bearer token to /api/users/details
-    and return the UUID.
-    """
     auth_header = request.META.get("HTTP_AUTHORIZATION", "")
     if not auth_header.startswith("Bearer "):
         raise AuthenticationFailed("Missing or malformed Authorization header")
@@ -40,24 +35,15 @@ def _extract_uuid(request):
 
 
 class SubmitView(generics.CreateAPIView):
-    """
-    POST /api/report/submit/
-    Body: { "title": "...", "content": "..." }
-    """
     serializer_class = DailyUpdateSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
     def perform_create(self, serializer):
         uuid_value = _extract_uuid(self.request)
-        # The serializer has uuid as read-only, so we pass it directly to .save()
         serializer.save(uuid=uuid_value)
 
 
 class DailyReportListView(generics.ListAPIView):
-    """
-    GET /api/report/daily-report/
-    Returns only the caller’s rows.
-    """
     serializer_class = DailyUpdateSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
