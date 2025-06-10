@@ -18,7 +18,8 @@ INSTALLED_APPS = [
     "corsheaders",
     "drf_yasg",
     "users",
-
+    "report",
+    
     # Added for REST framework and JWT
     "rest_framework",
     "rest_framework_simplejwt",
