@@ -40,7 +40,7 @@ class MumentUser(AbstractBaseUser):
     domain = models.CharField(max_length=100, blank=True, null=True)
     idea_submission = models.TextField()
     team = models.CharField(max_length=50, blank=True, null=True)
-
+    is_admin = models.BooleanField(default=False)
     last_login = None
 
     USERNAME_FIELD = "email"

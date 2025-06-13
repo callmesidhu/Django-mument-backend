@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     "users",
     "report",
+    "coordinators",
     
     # Added for REST framework and JWT
     "rest_framework",
