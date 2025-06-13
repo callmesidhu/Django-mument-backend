@@ -1,6 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
+from coordinators.models import Coordinator
 from .serializers import CoordinatorSerializer
 from rest_framework.permissions import AllowAny
 
@@ -13,3 +15,11 @@ class AddCoordinatorView(APIView):
             serializer.save()
             return Response({'message': 'Coordinator added successfully'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CoordinatorListView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        coordinators = CoordinatorSerializer(Coordinator.objects.all(), many=True)
+        return Response(coordinators.data, status=status.HTTP_200_OK)
