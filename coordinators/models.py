@@ -4,8 +4,9 @@ from django.contrib.postgres.fields import ArrayField
 class Coordinator(models.Model):
     coordinator_email = models.EmailField(
         max_length=100,
-        blank=True,       # allow form skips for now
-        null=True         # ✅ allow DB to skip filling it for existing rows
+        blank=True,     
+        null=True,
+        unique=True
     )
 
     
