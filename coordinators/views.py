@@ -54,3 +54,6 @@ class CoordinatorListView(APIView):
                 {"error": f"Could not retrieve coordinators: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+# class CoordinatorPlayerDetailsView(APIView):
+    

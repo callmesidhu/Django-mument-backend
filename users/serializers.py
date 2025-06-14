@@ -3,6 +3,11 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import MumentUser
 from django.contrib.auth.hashers import make_password
 
+class AllUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MumentUser
+        fields = '__all__' 
+
 class MumentUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     class Meta:
