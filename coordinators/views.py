@@ -1,25 +1,28 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-
-from coordinators.models import Coordinator
+from .models import Coordinator
 from .serializers import CoordinatorSerializer
-from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class AddCoordinatorView(APIView):
-    authentication_classes = []
-    permission_classes = [AllowAny]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         serializer = CoordinatorSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({'message': 'Coordinator added successfully'}, status=status.HTTP_201_CREATED)
+            return Response({"message": "Coordinator added successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class CoordinatorListView(APIView):
-    authentication_classes = []
-    permission_classes = [AllowAny]
+
+class ListCoordinatorsView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        coordinators = CoordinatorSerializer(Coordinator.objects.all(), many=True)
-        return Response(coordinators.data, status=status.HTTP_200_OK)
+        coordinators = Coordinator.objects.all()
+        serializer = CoordinatorSerializer(coordinators, many=True)
+        return Response({"data": serializer.data}, status=status.HTTP_200_OK)

@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils import timezone
+from django.contrib.postgres.fields import ArrayField
 
 class MumentUserManager(BaseUserManager):
     def create_user(self, email, name, phone, domain, idea_submission, password=None, **extra_fields):
@@ -40,8 +41,9 @@ class MumentUser(AbstractBaseUser):
     domain = models.CharField(max_length=100, blank=True, null=True)
     idea_submission = models.TextField()
     team = models.CharField(max_length=50, blank=True, null=True)
+    is_coordinator = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
-    coordinator_id = models.IntegerField(blank=True, null=True)
+
     last_login = None
 
     USERNAME_FIELD = "email"

@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import AddCoordinatorView, CoordinatorListView
+from .views import AddCoordinatorView, ListCoordinatorsView
 
 urlpatterns = [
-    path('add/', AddCoordinatorView.as_view(), name='add_coordinator'),
-    path('list/', CoordinatorListView.as_view(), name='list_coordinators'),
+    path("add-player/", AddCoordinatorView.as_view(), name="add-coordinator"),
+    path("list/", ListCoordinatorsView.as_view(), name="list-coordinators"),
 ]
