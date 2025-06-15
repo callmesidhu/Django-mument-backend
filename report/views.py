@@ -1,4 +1,3 @@
-# report/views.py
 import requests
 from django.conf import settings
 from rest_framework import generics, permissions
@@ -12,8 +11,7 @@ USER_DETAILS_URL = getattr(
     "https://mument-apis.onrender.com/api/users/details/",
 )
 
-
-def _extract_uuid(request):
+def _extract_user_details(request):
     auth_header = request.META.get("HTTP_AUTHORIZATION", "")
     if not auth_header.startswith("Bearer "):
         raise AuthenticationFailed("Missing or malformed Authorization header")
@@ -28,10 +26,14 @@ def _extract_uuid(request):
     except requests.RequestException as exc:
         raise AuthenticationFailed(f"Could not fetch user details: {exc}") from exc
 
-    uuid_value = r.json().get("uuid")
-    if not uuid_value:
-        raise AuthenticationFailed("UUID not present in user-details response")
-    return uuid_value
+    data = r.json()
+    uuid_value = data.get("uuid")
+    email_value = data.get("email")
+
+    if not uuid_value or not email_value:
+        raise AuthenticationFailed("UUID or Email not present in user-details response")
+
+    return uuid_value, email_value
 
 
 class SubmitView(generics.CreateAPIView):
@@ -39,8 +41,8 @@ class SubmitView(generics.CreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def perform_create(self, serializer):
-        uuid_value = _extract_uuid(self.request)
-        serializer.save(uuid=uuid_value)
+        uuid_value, email_value = _extract_user_details(self.request)
+        serializer.save(uuid=uuid_value, email=email_value)
 
 
 class DailyReportListView(generics.ListAPIView):
@@ -48,5 +50,5 @@ class DailyReportListView(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        uuid_value = _extract_uuid(self.request)
+        uuid_value, _ = _extract_user_details(self.request)
         return DailyUpdate.objects.filter(uuid=uuid_value)
