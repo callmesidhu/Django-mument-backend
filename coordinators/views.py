@@ -7,6 +7,8 @@ from .serializers import CoordinatorSerializer
 from .permissions import IsCoordinator
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
+from report.models import DailyUpdate
+from report.serializers import DailyUpdateSerializer
 from rest_framework.permissions import IsAuthenticated
 
 class AddCoordinatorView(APIView):
@@ -60,72 +62,35 @@ class CoordinatorListView(APIView):
 
     
 class CoordinatorPlayerDetailsView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]  
 
     def get(self, request):
         try:
             coordinators = Coordinator.objects.all()
-
-            users_api = "https://mument-apis.onrender.com/api/users/all/"
-            reports_api = "https://mument-apis.onrender.com/api/report/daily-report/"
-
-            # Get user data
-            users_response = requests.get(users_api)
-            users_data = users_response.json()
-            if not isinstance(users_data, list):
-                raise ValueError("Invalid format for users data")
-
-            email_to_uuid = {
-                user["email"]: user["uuid"] for user in users_data if "email" in user and "uuid" in user
-            }
-
-            # Get reports
-            reports_response = requests.get(reports_api)
-
-            try:
-                reports_data = reports_response.json()
-            except Exception as e:
-                return Response(
-                    {"error": f"Failed to parse reports JSON: {str(e)}", "raw_response": reports_response.text},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-
-            # Debug print actual format
-            if not isinstance(reports_data, list):
-                return Response(
-                    {
-                        "error": "Invalid format for reports data",
-                        "received_type": str(type(reports_data)),
-                        "example_data": reports_data
-                    },
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-
-
             result = []
 
-            for coordinator in coordinators:
-                players_info = []
+            for coord in coordinators:
+                coord_data = {
+                    "id": coord.id,
+                    "coordinator_email": coord.coordinator_email,
+                    "players_email": {}
+                }
 
-                for email in coordinator.players_email:
-                    uuid = email_to_uuid.get(email)
-                    if uuid:
-                        reports = [report for report in reports_data if report.get("uuid") == uuid]
-                        players_info.append({
-                            "email": email,
-                            "uuid": uuid,
-                            "reports": reports
-                        })
+                for player_email in coord.players_email:
+                    updates = DailyUpdate.objects.filter(email=player_email)
+                    updates_serialized = DailyUpdateSerializer(updates, many=True).data
 
-                result.append({
-                    "coordinator_email": coordinator.coordinator_email,
-                    "players": players_info
-                })
+                    if updates_serialized:
+                        coord_data["players_email"][player_email] = updates_serialized
+                    else:
+                        coord_data["players_email"][player_email] = "No reports submitted"
+
+                result.append(coord_data)
 
             return Response(result, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response(
-                {"error": f"Failed to fetch data: {str(e)}"},
+                {"error": f"Could not retrieve coordinator player details: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
