@@ -20,6 +20,8 @@ INSTALLED_APPS = [
     "users",
     "report",
     "coordinators",
+    "checkpoint",
+    
     
     # Added for REST framework and JWT
     "rest_framework",
