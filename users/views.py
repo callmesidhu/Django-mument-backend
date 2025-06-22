@@ -34,7 +34,7 @@ class ProtectedView(APIView):
         return Response(serializer.data)
 
 class UserUpdateView(APIView):
-
+    permission_classes = [IsAuthenticated]
     def patch(self, request):
         user = request.user
         serializer = UserUpdateSerializer(user, data=request.data, partial=True)
@@ -47,3 +47,23 @@ class UserUpdateView(APIView):
             }, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ResetPasswordView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        phone = request.data.get('phone')
+        new_password = request.data.get('new_password')
+
+        if not (email and phone and new_password):
+            return Response({'error': 'All fields are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = MumentUser.objects.get(email=email, phone=phone)
+            user.set_password(new_password)
+            user.save()
+            return Response({'message': 'Password updated successfully'}, status=status.HTTP_200_OK)
+        except MumentUser.DoesNotExist:
+            return Response({'error': 'User with this email and phone not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
