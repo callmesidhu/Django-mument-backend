@@ -34,7 +34,6 @@ class ProtectedView(APIView):
         return Response(serializer.data)
 
 class UserUpdateView(APIView):
-    permission_classes = [IsAuthenticated]
 
     def patch(self, request):
         user = request.user
