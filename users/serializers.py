@@ -20,4 +20,4 @@ class MumentUserSerializer(serializers.ModelSerializer):
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = MumentUser
-        fields = ["name", "img_url", "mu_id", "phone", "domain", "idea_submission", "team"]
+        fields = ["name", "img_url", "mu_id", "phone", "domain", "idea_submission", "team", "password"]
